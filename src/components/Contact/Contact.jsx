@@ -10,7 +10,7 @@ const Contact = ({ contact, onDeleteContact }) => {
         <div className={styles.contactInfo}>
           <p className={styles.dataContact}>
             <FontAwesomeIcon icon={faUser} className={styles.icon} />
-            {contact.name}
+            <span className={styles.contactName}>{contact.name}</span>
           </p>
           <p className={styles.dataContact}>
             <FontAwesomeIcon icon={faPhone} className={styles.icon} />

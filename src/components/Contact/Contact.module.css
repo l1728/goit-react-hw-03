@@ -16,14 +16,23 @@
 }
 
 .icon {
-  margin-right: 8px;
+  margin-right: 5px;
   color: green;
 }
 
 .dataContact {
+  display: flex;
+  align-items: center;
   color: bisque;
   margin: 0;
   font-size: 20px;
+  padding: 5px;
+}
+.contactName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 150px;
 }
 .contactInfo {
   display: flex;
