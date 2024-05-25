@@ -1,8 +1,10 @@
-import './App.css';
-import { useState } from 'react';
+import styles from './App.module.css';
+import { useState, useEffect } from 'react';
 import ContactForm from '../ContactForm/ContactForm';
 import SearchBox from '../SearchBox/SearchBox';
 import ContactList from '../ContactList/ContactList';
+import 'izitoast/dist/css/iziToast.min.css';
+import iziToast from 'izitoast';
 
 const initialContacts = [
   { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
@@ -12,9 +14,18 @@ const initialContacts = [
 ];
 
 const App = () => {
-  // Стан для зберігання контактів та пошукового запиту
-  const [contacts, setContacts] = useState(initialContacts);
+  // Ініціалізація стану з локального сховища або початкових контактів
+  const [contacts, setContacts] = useState(() => {
+    const savedContacts = localStorage.getItem('contacts');
+    return savedContacts ? JSON.parse(savedContacts) : initialContacts;
+  });
+
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Збереження контактів у localStorage при зміні списку контактів
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
 
   // Функція для додавання нового контакту
   const addContact = newContact => {
@@ -23,7 +34,18 @@ const App = () => {
         contact => contact.name.toLowerCase() === newContact.name.toLowerCase()
       )
     ) {
-      alert(`${newContact.name} is already in contacts.`);
+      iziToast.error({
+        title: 'Error',
+        message: `${newContact.name} is already in contacts.`,
+        position: 'topCenter',
+        timeout: 5000,
+        backgroundColor: '#F44336',
+        titleColor: '#FFFFFF',
+        messageColor: '#FFFFFF',
+        titleSize: '24px',
+        messageSize: '22px',
+        class: styles.customToast,
+      });
       return;
     }
     setContacts(prevContacts => [...prevContacts, newContact]);
@@ -33,6 +55,12 @@ const App = () => {
   const handleSearch = query => {
     setSearchQuery(query);
   };
+  // Функція для видалення контакта з певним id
+  const deleteContact = contactId => {
+    setContacts(prevContacts =>
+      prevContacts.filter(contact => contact.id !== contactId)
+    );
+  };
 
   // Фільтрація контактів на основі пошукового запиту
   const filteredContacts = contacts.filter(contact =>
@@ -41,10 +69,13 @@ const App = () => {
 
   return (
     <div>
-      <h1>Phonebook</h1>
+      <h1 className={styles.h1}>Phonebook</h1>
       <ContactForm addContact={addContact} />
       <SearchBox searchQuery={searchQuery} handleSearch={handleSearch} />
-      <ContactList contacts={filteredContacts} />
+      <ContactList
+        contacts={filteredContacts}
+        onDeleteContact={deleteContact}
+      />
     </div>
   );
 };
